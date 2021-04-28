@@ -1,0 +1,46 @@
+# docker-composeファイルのバージョン
+version: '3.8'
+
+# アプリケーションを動かすための要素名。任意で設定。
+services:
+    iis:
+
+# 対処湯のイメージを記載する。[イメージ名]：[タグ]。タグを記載しない場合は最新(latest)のものをもってくる。
+       image: iis02:0130
+
+# コンテナの名前
+       container_name: iis-Container
+
+# コンテナのホスト名
+       hostname: iis-ap
+
+# xx:yy形式。xxがホスト側ポート、yyがコンテナ側ポートとなり、ホスト側のxx番ポートとコンテナ側のyy番ポートがマッピングされます。
+       ports:
+            - 3000:80
+
+# ボリューム永続化の設定。[コンテナホストのボリューム]:[コンテナのボリューム]
+       volumes:
+            - iis-data-volume:C:\inetpub
+
+# ネットワークの指定。
+       networks:
+            - container-link
+
+# ネットワークの指定の定義。
+networks:
+  container-link:
+     name: docker.internal.test
+     driver: nat
+     ipam:
+       driver: default
+       config:
+         - subnet: "172.20.100.0/24"
+
+# マウントするコンテナホスト側のボリュームの定義
+# コンテナのデータ永続化用のデータボリューム（同名がなければ自動生成される）
+# 自動的に "C:\ProgramData\Docker\volumes" 配下にフォルダが作成されます。
+volumes:
+  # postgresコンテナのデータ永続化用のデータボリューム（同名がなければ自動生成される）
+  iis-data-volume:
+    name: iis-data
+    driver: local
