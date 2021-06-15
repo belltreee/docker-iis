@@ -2,7 +2,7 @@
 # FROM *** で使用するベースイメージを指定
 FROM mcr.microsoft.com/windows/servercore/iis
 
-# ホストの SampleFolder を コンテナの C:\ 配下にコピーする
+# ホストの C:\docker\buils\SampleFolder を コンテナの C:\ 配下にコピーする
 COPY SampleFolder /SampleFolder
 
 #APS.NET4.7インストール(関連ファイル含む)
