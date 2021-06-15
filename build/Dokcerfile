@@ -1,0 +1,18 @@
+
+# FROM *** で使用するベースイメージを指定
+FROM mcr.microsoft.com/windows/servercore/iis
+
+# ホストの SampleFolder を コンテナの C:\ 配下にコピーする
+COPY SampleFolder /SampleFolder
+
+#APS.NET4.7インストール(関連ファイル含む)
+RUN powershell Install-WindowsFeature -Name Web-Asp-Net45 -IncludeManagementTools && \
+    C:\Windows\System32\inetsrv\appcmd.exe add apppool /name:IISPool /managedRuntimeVersion:v4.0 /managedPipelineMode:Integrated /enable32BitAppOnWin64:true /processModel.identityType:NetworkService && \
+    C:\Windows\System32\inetsrv\appcmd.exe add app /site.name:"Default Web Site" /path:/001 /physicalPath:"C:\IIS_Site\001" /applicationPool:"IISPool" && \
+    C:\Windows\System32\inetsrv\appcmd.exe add app /site.name:"Default Web Site" /path:/002 /physicalPath:"C:\IIS_Site\002" /applicationPool:"IISPool" && \ 
+    C:\Windows\System32\inetsrv\appcmd.exe add app /site.name:"Default Web Site" /path:/003 /physicalPath:"C:\IIS_Site\003" /applicationPool:"IISPool" && \ 
+    C:\Windows\System32\inetsrv\appcmd.exe set config "Default Web Site/003" /section:staticContent /+"[fileExtension='.config',mimeType='text/xml']"
+
+# コンテナ 起動時に実行されるコマンド。ServiceMonitor.exe が w3svcのサービス(IISのサービス)状態を監視。 
+#w3svcのサービスが停止すればコンテナも停止する。
+CMD ["C:\\ServiceMonitor.exe", "w3svc"]
